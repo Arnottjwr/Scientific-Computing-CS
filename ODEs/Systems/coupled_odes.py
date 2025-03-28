@@ -14,13 +14,6 @@ torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 
 
-# Define the system of ODEs
-def system(y, x):
-    y1, y2 = y
-    dy1_dxdx = x*y1 - y2 -2 - x
-    dy2_dxdx = y2 -6*x + 2 -x*x*(1-x)
-    return [dy1_dxdx, dy2_dxdx]
-
 def analytical(x, y0):
     # y0 = np.array([1,0])
     # y  = odeint(DE, y0, x)
@@ -128,8 +121,8 @@ for epoch in range(num_epochs):
     ddy2  = ag.grad(dy2, x_physics, torch.ones_like(dy2), create_graph=True)[0]
 
     # Compute the internal loss
-    y1_loss = torch.mean((ddy1 - x_physics*y1 - 2)**2) + gamma*loss_bc_y1
-    y2_loss = torch.mean((ddy2 +y2 +4*x_physics -2  +x_physics*y1)**2) + gamma*loss_bc_y2
+    y1_loss = torch.mean((ddy1 - x_physics * y1 - 2 +2*x_physics - y2)**2) + gamma * loss_bc_y1
+    y2_loss = torch.mean((ddy2 - y1 -1 + (5+x_physics)*x_physics)**2) + gamma * loss_bc_y2
     loss_y = l1_weighting*y1_loss +y2_loss
     
     # backpropagate joint loss
